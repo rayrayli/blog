@@ -4,8 +4,8 @@
 
 # Site
 title: Ray's blog
-subtitle: Coding, Life and Thoughts
-description: Ray's blog
+subtitle: Code, Life and Thoughts
+description: These violent delights have violent ends.
 keywords:
 author: Rui Li
 language: en
@@ -107,3 +107,18 @@ deploy:
   repo: git@github.com:rayrayli/blog.git
   branch: gh-pages
   message: Update website at {{ now('YYYY-MM-DD HH:mm:ss') }}
+
+feed:
+  enable: true
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
+  content:
+  content_limit: 140
+  content_limit_delim: ' '
+  order_by: -date
+  icon: icon.png
+  autodiscovery: true
+  template:
+
