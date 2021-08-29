@@ -164,6 +164,313 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rayrayli.github.io/blog/2021/07/05/python%E4%B8%AD%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8F%92%E5%80%BC%E6%9B%BF%E6%8D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.jpeg">
+      <meta itemprop="name" content="Rui Li">
+      <meta itemprop="description" content="These violent delights have violent ends.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ray's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2021/07/05/python%E4%B8%AD%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8F%92%E5%80%BC%E6%9B%BF%E6%8D%A2/" class="post-title-link" itemprop="url">python中字符串插值替换</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-07-05 23:08:57" itemprop="dateCreated datePublished" datetime="2021-07-05T23:08:57-04:00">2021-07-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-08 22:17:55" itemprop="dateModified" datetime="2021-07-08T22:17:55-04:00">2021-07-08</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>python string interpolation，我在这里翻译成字符串插值替换。 字符串插值替换常见于<code>f-strings</code>, <code>uniterploated c-string</code> 和<code>str.format()</code>三种字符串格式化方法中. 这篇blog来比较一下三种不同的插值方法，以及在什么场景下分别用哪一种。</p>
+<h2 id="c-string"><a href="#c-string" class="headerlink" title="c-string"></a>c-string</h2><p> 即printf-style，这是python中最原始的字符串的格式化方式，学过C语言的都知道，常见使用方式为字符串中使用%conversionType 占位 ， conversiontype 用来代表需要插值的类型，字符串为%s, 整型为%d，等等。<br> 比如：<br><code>   &#39;my name is %s, I&#39;m %d years old.&#39; % ( &#39;Rui&#39;, 18)</code></p>
+<h2 id="str-format"><a href="#str-format" class="headerlink" title="str.format()"></a>str.format()</h2><p>为python 2.6引入, 支持特定类型的格式化，比如Datetime：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">from datetime import date</span><br><span class="line">d &#x3D; date.fromordinal(730920) # 730920th day after 1. 1. 0001</span><br><span class="line">fmt&#x3D;&#39;the &#123;1&#125; is &#123;0:%d&#125;, the &#123;2&#125; is &#123;0:%B&#125;.format(d, &quot;day&quot;, &quot;month&quot;)</span><br><span class="line">&#39;The day is 11, the month is March.&#39;</span><br></pre></td></tr></table></figure>
+<p>同一个字符串中支持关键字参数和位置参数的混合使用等。</p>
+<h2 id="f-string"><a href="#f-string" class="headerlink" title="f-string"></a>f-string</h2><p>Python 3.6 引入的。保留了str.format()的特性，同时减少了运行时间，又增加了可读性。<br>例如：<br>age = 30, name = Rui<br>‘my name is {name} , I’m {max(18, age)} years old’</p>
+<h2 id="该用哪一个"><a href="#该用哪一个" class="headerlink" title="该用哪一个"></a>该用哪一个</h2><p>先说结论：<br>如果你是python 3.6 以上的版本，默认使用f-strings，否则使用printf-style。<br>如果是logging的情况，使用uninterpolated c-strings。<br>如果是templating的情况，使用str.format().</p>
+<h3 id="性能比对"><a href="#性能比对" class="headerlink" title="性能比对"></a>性能比对</h3><p>f-strings 既包含了str.format()的功能，又拥有c-strings的执行速度。</p>
+<p>为了测试他们的性能，我安装了line_profiler, 并且写一段python代码，重复执行10000次进行比较f-string, c-string 和 str.format() 的运行速度：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python  </span><br><span class="line">  </span><br><span class="line">import line_profiler  </span><br><span class="line">import atexit  </span><br><span class="line">  </span><br><span class="line">profile &#x3D; line_profiler.LineProfiler()  </span><br><span class="line">atexit.register(profile.print_stats)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def printf_style(p1, p2):  </span><br><span class="line">    &#39;param 1: %s, param2: %s&#39; %(p1, p2)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def f_string_style(p1, p2):  </span><br><span class="line">    f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def format_style(p1, p2):  </span><br><span class="line">    &#39;param1: &#123;&#125;, param2: &#123;&#125;&#39;.format(p1, p2)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">p1 &#x3D; &quot;hi, this is p1&quot;  </span><br><span class="line">p2 &#x3D; Exception(&quot;hi, this is exception&quot;)  </span><br><span class="line">  </span><br><span class="line">for i in range(10000):  </span><br><span class="line">    printf_style(p1, p2)  </span><br><span class="line">    f_string_style(p1, p2)  </span><br><span class="line">    format_style(p1, p2)</span><br></pre></td></tr></table></figure>
+<p>使用<code>kernprof -l -v compare.py</code> 进行调用显示profile，执行结果如下，Time列的单位是微秒us：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Line #      Hits         Time  Per Hit   % Time  Line Contents</span><br><span class="line">    12     10000       7408.0      0.7    100.0      &#39;param 1: %s, param2: %s&#39; %(p1, p2)</span><br><span class="line">    17     10000       6769.0      0.7    100.0      f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;</span><br><span class="line">    22     10000      11052.0      1.1    100.0      &#39;param1: &#123;&#125;, param2: &#123;&#125;&#39;.format(p1, p2)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>从上面的执行结果可以看出来，f-strings 最快，str.format()最慢，而printf-style 跟f-string是接近的，时间差别可以忽略不计。因此我们在python3.6 以上的版本默认使用f-string，f-string可读性更高一点。</p>
+<h3 id="logging"><a href="#logging" class="headerlink" title="logging"></a>logging</h3><p>对于logging，我们使用不可插值的c-string， 把字符串当成参数传入logging 函数，比如：<br><code>logger.debug(&#39;param 1 %s&#39;, p1)</code></p>
+<p>这种情况下，logger的展开是惰性插值的（lazy interpolation），即如果你的log level没有被启用，字符串是不会进行插值处理的，这样能省很多时间，因为字符串的插值处理需要寻找到目标字符串的位置并且插入是比较耗费时间的。</p>
+<p>我们继续使用一段程序进行性能比对：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python  </span><br><span class="line">  </span><br><span class="line">import line_profiler  </span><br><span class="line">import atexit  </span><br><span class="line">import logging  </span><br><span class="line">  </span><br><span class="line">profile &#x3D; line_profiler.LineProfiler()  </span><br><span class="line">atexit.register(profile.print_stats)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">class Handler(logging.Handler):  </span><br><span class="line">    def emit(self, rec):  </span><br><span class="line">        self.format(rec)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">logging.basicConfig(handlers&#x3D;[Handler(level&#x3D;logging.ERROR)])  </span><br><span class="line">logger &#x3D; logging.getLogger()  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def printf_style_debug(p1, p2):  </span><br><span class="line">    logger.debug(&#39;param 1: %s, param2: %s&#39;, p1, p2)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def f_string_style_debug(p1, p2):  </span><br><span class="line">    logger.debug(f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def printf_style_error(p1, p2):  </span><br><span class="line">    logger.error(&#39;param 1: %s, param2: %s&#39;,p1, p2)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">@profile  </span><br><span class="line">def f_string_style_error(p1, p2):  </span><br><span class="line">    logger.error(f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;)  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">p1 &#x3D; &quot;hi, this is p1&quot;  </span><br><span class="line">p2 &#x3D; Exception(&quot;hi, this is exception&quot;)  </span><br><span class="line">  </span><br><span class="line">for i in range(10000):  </span><br><span class="line">    printf_style_debug(p1, p2)  </span><br><span class="line">    f_string_style_debug(p1, p2)  </span><br><span class="line">    printf_style_error(p1, p2)  </span><br><span class="line">    f_string_style_error(p1, p2)</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>kernprof -l -v loggercompare.py</code> 进行调用并打印profile结果如下，Time列的单位是微秒us：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Line #      Hits         Time  Per Hit   % Time  Line Contents</span><br><span class="line">    22     10000      18870.0      1.9    100.0      logger.debug(&#39;param 1: %s, param2: %s&#39;, p1, p2)</span><br><span class="line">    27     10000      20943.0      2.1    100.0      logger.debug(f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;)</span><br><span class="line">    32     10000     551198.0     55.1    100.0      logger.error(&#39;param 1: %s, param2: %s&#39;,p1, p2)</span><br><span class="line">    37     10000     556495.0     55.6    100.0      logger.error(f&#39;param 1:&#123;p1&#125;, param2: &#123;p2&#125;&#39;)</span><br></pre></td></tr></table></figure>
+<p>可以看到，在debug没有开的情况下，printf-style 比f-string要快10%。</p>
+<p>另外如果logging过程出现了exception，使用 uninterplated printf-style 的logging方式可以让logging 库捕获此类exception，而f-strings则直接抛出异常。</p>
+<h3 id="templating"><a href="#templating" class="headerlink" title="templating"></a>templating</h3><p>看到这里，你会想str.format() 又慢，可读性又差，是不是就没有用了？ 答案是str.format()用来进行templating比起f-strings是个不错的选择。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">def iter_name():  </span><br><span class="line">    info &#x3D; [  </span><br><span class="line">        [&quot;rui&quot;,&quot;18&quot;, &quot;NJ&quot;],  </span><br><span class="line">  [&quot;ray&quot;, &quot;19&quot;, &quot;NY&quot;],  </span><br><span class="line">  [&quot;eric&quot;, &quot;20&quot;, &quot;china&quot;],  </span><br><span class="line">  ]  </span><br><span class="line">  </span><br><span class="line">    for i in info:  </span><br><span class="line">        yield &#123;&#39;name&#39;: i[0], &#39;age&#39;: i[1], &#39;loc&#39;: i[2]&#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">def print_info(tmp):  </span><br><span class="line">    for name in iter_name():  </span><br><span class="line">        print(tmp.format(**name))  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">print_info(&quot;hi, my name is &#123;name&#125;, I&#39;m &#123;age&#125;, my location is &#123;loc&#125;&quot;)</span><br></pre></td></tr></table></figure>
+<p>执行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hi, my name is rui, I&#39;m 18, my location is NJ</span><br><span class="line">hi, my name is ray, I&#39;m 19, my location is NY</span><br><span class="line">hi, my name is eric, I&#39;m 20, my location is china</span><br></pre></td></tr></table></figure>
+<p>而f-string中变量在定义了以后即需要被替换求值，相比f-string和c-string，str.format() 用来做templating更加方便。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rayrayli.github.io/blog/2021/05/02/%E5%BD%93%E4%BD%A0%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%90%8E%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.jpeg">
+      <meta itemprop="name" content="Rui Li">
+      <meta itemprop="description" content="These violent delights have violent ends.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ray's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2021/05/02/%E5%BD%93%E4%BD%A0%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%90%8E%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/" class="post-title-link" itemprop="url">当你在浏览器中输入网址后回车发生了什么</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-05-02 18:42:41" itemprop="dateCreated datePublished" datetime="2021-05-02T18:42:41-04:00">2021-05-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-20 12:07:54" itemprop="dateModified" datetime="2021-07-20T12:07:54-04:00">2021-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/network/" itemprop="url" rel="index"><span itemprop="name">network</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>你是否曾经思考过我们每天到底是如何上网的呢？当你打开电脑，在浏览器上输入网址，比如<a target="_blank" rel="noopener" href="http://www.baidu.com,或者其他什么八卦网址/">www.baidu.com，或者其他什么八卦网址</a>,  然后按下回车的那一秒，你就能看到你想要的内容了（当然，假设你们家的网速足够快-_-）。那么我们来从专业的角度来聊聊在这短短的不到一秒背后到底发生了什么。</p>
+<blockquote>
+<p>文章预计阅读时间5分钟，部分内容需要有一定计算机背景知识的读者才能理解。</p>
+</blockquote>
+<h2 id="浏览器预处理"><a href="#浏览器预处理" class="headerlink" title="浏览器预处理"></a>浏览器预处理</h2><p>我们输入的<code>URL(Uniform Resoure Locator)</code>网址 , 例如<code>http://www.baidu.com</code> , 包含了两个重要的部分， 一个是http，表示使用Hyper Text Transfer Protocol 超文本传输协议来进行访问网页资源，另一个是资源的位置，如果<a target="_blank" rel="noopener" href="http://www.baidu.com后面没有其他内容,表示我们需要获取hostname是baidu.com的服务器下主页面的内容./">www.baidu.com后面没有其他内容，表示我们需要获取hostname是baidu.com的服务器下主页面的内容。</a></p>
+<p>但是有的时候我们的网址五花八门的，比如<code>https://中文.台灣/index.html </code>中出现了中文，当你把这网址复制到浏览器的输入框的时候，浏览器会自动使用Punycode编码方式对你的网址中的unicode进行转换，那么其实你是用<code>https://xn--fiq228c.xn--kpry57d/index.html</code>这个地址对网站进行访问的。</p>
+<p>另外如果你的浏览器支持<code>HSTS（HTTP Strict Transport Security）</code>即HTTP严格传输安全功能，这个功能会使你访问一个网站时必须使用更安全的HTTPS协议， 如果你要访问的网址在浏览器保存的 “HSTS Preload List” 中，那么最终访问的网址会被转换为使用HTTPS进行访问。</p>
+<h2 id="DNS-lookup"><a href="#DNS-lookup" class="headerlink" title="DNS lookup"></a>DNS lookup</h2><p>DNS的全名是（Domain Name System）即域名系统， 它负责将人类可以读懂的文字，比如baidu.com, 翻译成为机器可以看懂的IP地址，比如<code>39.156.69.79</code>。 DNS服务器的地址一般是ISP运营商或者是本地路由器缓存的DNS服务器的ip地址，假设这里目标IP是<code>8.8.8.8</code>。</p>
+<p>浏览器会接下来检查要访问的域名（baidu.com) 是否在浏览器缓存中，如果不在，则进行系统调用<code>gethostbyname</code>尝试从主机获得域名，如果主机cache中和hosts 文件中也没有存储域名，则系统发起DNS 查询，向DNS服务器发送一条消息。</p>
+<p>我们现在知道我们想向这个地址发一条消息来查询我们想要的baidu的IP地址，但是不知道具体走哪条路径发过去，这个时候，我们先去本地的路由表查一下哪条路可以到<code>8.8.8.8</code>， 如果我们的主机和目标IP在同一个子网，我们使用这条路，否则我们采用默认网关这条路径。比如，假设我们主机是在<code>192.168.0.0 </code>这个网段上，那么<code>8.8.8.8</code> 和我们不在一个子网，则使用默认网关<code>192.168.0.1</code>的默认网关进行发送数据。这意味着我们有一个IP数据包，这个包会被发送到本地路由器，路由器将根据自己的路由表负责继续将它转发到下一个跳，直到到达目标DNS服务器<code>8.8.8.8</code>. </p>
+<p>那么我们知道了要发送消息的网口IP地址，这条DNS消息大概是长什么样呢？</p>
+<p><img src="./images/TCPconnect/DNSquery1.png" alt="DNSquery1.png"></p>
+<p>我们可以看到，一个DNS query类型是A的消息外面包裹着UDP报文的头，然后外面包裹了IP报文的头（源IP地址即刚才查出来的接口IP地址；目的IP地址为DNS服务器地址等），最后包裹了以太帧。以太帧里面需要填充源MAC地址和目的MAC地址。网络中每台设备都有一个唯一的网络标识，这个地址叫<strong>MAC</strong>地址或<strong>网卡</strong>地址，由网络设备制造商生产时写在硬件内部。</p>
+<p>我们已经知道源MAC地址是本地发送接口的物理地址，但是还是不知道目标MAC地址， 那么我们需要发起ARP查询去找到这个MAC地址。</p>
+<h2 id="ARP查询"><a href="#ARP查询" class="headerlink" title="ARP查询"></a>ARP查询</h2><p>ARP的意思即<code>address resolution protocal</code>，即地址解析协议，它用于实现从IP 地址到MAC 地址的映射，即询问目标IP对应的MAC地址。</p>
+<p>在上面的图中我们看到，DNS的服务器地址和我们的主机不在一个子网当中，那么系统会对默认网关地址进行发起ARP查询。<br>相反如果他们在同一个子网，则系统对DNS服务器地址发起ARP查询。</p>
+<p>为了找到目的MAC地址，主机先去本地保存的一张ARP表中查询是否有缓存好的默认网关IP地址对应Mac地址的转换记录，如果有则直接返回，如果没有，则要发送一个ARP请求消息去查询这个地址。在这里的例子中，我们是要找路由器的Mac地址。</p>
+<p>这条消息长下面这个样子，其中源IP地址是原始请求的IP地址，目的IP地址是路由器的IP，目的MAC地址填充了全F表示这是个广播地址，我们要广播发送这条消息。</p>
+<p><img src="./images/TCPconnect/ARP1.png" alt="ARP1.png"></p>
+<p>它是按照下面的原则进行发送的：</p>
+<ul>
+<li>如果我们的电脑和路由器是直连的，路由器就会直接返回一个ARP reply的消息（如下图所示）；</li>
+<li>如果我们连接了一个集线器，集线器会把这个ARP消息向它的其他所有端口进行广播</li>
+<li>如果我们连接了一个交换机，交换机会在本地的MAC/CAM表中查询哪个端口有我们需要的那个mac地址，如果没找到则向所有其他端口进行广播ARP消息，如果找到了，则向对应的端口发送ARP，直至找到需要的mac地址。</li>
+</ul>
+<p>Router收到这条ARP消息后，将收到的源IP和源Mac地址保存起来为了以后转换使用，同时将自己的Mac填充到源mac字段，返回给我们的主机一条ARP reply消息，</p>
+<p><img src="./images/TCPconnect/ARP2.png" alt="ARP2.png"></p>
+<p>现在我们有了router的mac地址，主机上可以将它填充到我们之前到那条DNS查询消息中，继续进行DNS查询啦。<br><img src="./images/TCPconnect/DNSReply.png" alt="DNSReply.png"></p>
+<h2 id="继续DNS-lookup"><a href="#继续DNS-lookup" class="headerlink" title="继续DNS lookup"></a>继续DNS lookup</h2><p>DNS消息发送到路由器以后，在自己的路由表中寻找目的IP，并且寻找合适的路径发送出去， 如果我们是在私网，但是需要发送到一个公共网络地址，那么还需要做NAT（network address translation) 网络地址转换，NAT会将源内部IP地址替换成一个对外的外部IP地址，源内部端口号替换成一个外部端口号。<br>通过下图可以看到DNS query的整个过程：<br><img src="./images/TCPconnect/DNSQueryProcess.png" alt="DNSQueryProcess.png"></p>
+<p>DNS消息到达DNS服务器（我们称之为DNS resolver）以后，首先查看DNS resolver的本地cache有没有存储对应的类型A的记录，如果没有但是有保存authoritative nameservers的NS（nameserver）记录的话，则直接去这些authoritative nameservers去查询。<br>如果DNS resolver既没有缓存，也没有NS记录，则直接发送一条向TLD（Top-Level domain） server 的查询，在这里指的就是.com 域名的服务器。<br>如果DNS resolver 没有指向 TLD server的记录， 那么他会先向root server（即.）发起查询.（<strong>如图所示步骤2</strong>）然后进行<strong>Recursive Query</strong>依次执行<strong>步骤2-7</strong>。不过这种情况很少出现，出现的话说明DNS cache被清空了。<br>经过一层一层的查询，保存我们想要结果那个DNS nameserver 会发送一条DNS 的确认消息，然后这条消息按照原路返回到我们的电脑，如上图所示<strong>步骤8</strong>。<br>消息大致内容如下：<br><img src="./images/TCPconnect/DNSReply.png" alt="DNSReply.png"><br>消息中包含了我们想要的baidu.com的服务器的IP地址，有了它，我们就可以执行步骤9和步骤10了。</p>
+<h2 id="准备TCP连接"><a href="#准备TCP连接" class="headerlink" title="准备TCP连接"></a>准备TCP连接</h2><p>当浏览器得到我们的目标IP地址以后，根据使用的协议类型使用不同的端口号，HTTP是80，HTTPS是443，然后调用socket() 系统调用， 创建一个TCP socket，然后使用send 系统调用发送。 客户端发送后将自己的状态从LISTEN状态设置为SYNSENT状态。<br>消息在先传输层被封装成TCP报文，填入源端口和目的端口，由于该条消息是TCP连接的初始消息，所以TCP头中包含了一个初始序列号（Initial Sequence Number）x 和一个SYN 标志。<br>消息在网络层被封装成IP报文，填入源IP和目标IP地址，然后在链路层封装以太帧，填入源mac地址和目的mac地址等。<br>这条消息在发送前大致长这样：</p>
+<p><img src="./images/TCPconnect/TCPSYN.png" alt="TCPSYN.png"></p>
+<p>和DNS消息发送的过程类似，消息经过本地网络，通过modem将数字信号转换成模拟信号，在接收端再由modem将模拟信号转换成数字信号，交给下一个网络节点处理。消息每经过一个路由器，会被从IP头中取出目标地址，然后选择正确的路由发送到下一个地址。 消息中IP头包含了一个TTL字段，每经过一个路由器，这个字段的值会被减一，如果为0，或者路由器的接收队列拥塞，则这个包会被丢弃，并且给发送端返回一条ICMP Error message。<br>消息到达管理本地子网的路由器以后，经过自治区域的边界路由器，再经过其他自治区，最终到达目标服务器。</p>
+<h2 id="确认TCP连接"><a href="#确认TCP连接" class="headerlink" title="确认TCP连接"></a>确认TCP连接</h2><p>目标服务器的对应端口号处于监听状态，在收到这条消息以后，经过层层解析，看到这条消息是SYN被设置，知道了这是一条来自客户端的创建TCP连接的初始消息，如果它可以建立新的连接，它会准备回复给客户端一条消息表示自己可以建立这个连接:<br>它选择一个他自己的序列号ISN = y，并在TCP头中设置SYN bit = 1，然后把客户端消息中的ISN(即x) + 1，复制到 消息中的ACK 域，并且设置 ACK 位，表明自己接收到了客户端的第一个封包，然后发送出去。我们可以将这条消息称为进行第二次的握手SYNACK消息。服务器端的状态由Listen状态更新为SYN RCVD状态。 </p>
+<p>客户端接收到这条消息以后，知道了服务器端是活着的，它将准备一条ACK消息告诉Server自己收到了上一条SYNACK消息。它把SYNACK消息中的ISN（这里是服务器的ISN） + 1，复制到消息中的ACK域，并设置ACK位，并将自己客户端的ISN+1，然后按照同样的路径发送给服务器。 客户端状态更新为ESTABLISH状态。</p>
+<p><img src="./images/TCPconnect/TCPThreeHandshake.png" alt="TCPThreeHandshake.png"></p>
+<p>服务器端收到这条ACK消息，知道了客户端也是活着的，将该连接状态也更新为ESTABLISH状态， 到这里，建立TCP连接的三次握手就正式结束。可以看到三次握手的主要目的，就是让两方的每一方面都知道连接开始了，并且还交换了各自的状态和ISN号码，为后续的发送内容数据做好了准备。</p>
+<h2 id="数据请求"><a href="#数据请求" class="headerlink" title="数据请求"></a>数据请求</h2><p>我们做了前面的那么多准备工作以后，终于开始要发送真正的HTTP请求了。实际中数据的请求消息是常常会和上述三次握手中客户端ACK消息一起发送给服务器端的。<br>因为直接在地址栏中输入 URL 这种情况下，使用的是 GET 方法，所以这里的HTTP请求的结构是这样的：<br><code> GET / HTTP/1.1 Host: baidu.com Connection: close [其他头部]</code></p>
+<p>其中<code>GET</code> 是请求资源的方式，表示对请求URI 地址<code>/</code>采用的方法类型，URI 地址<code>/</code> 则表示请求的是baidu.com root server下面的资源。HTTP/1.1 表示HTTP使用1.1版本的协议。<code>connection:close</code> 表示发送者使用这个选项指示这次连接在响应结束之后会断开。<br>在发送完这些请求和头部之后，浏览器发送一个换行符，表示要发送的内容已经结束了。</p>
+<p>同之前发送建立TCP连接的请求消息一样，这个HTTP请求在发送过程中会首先经过TCP传输层，封装源端口号和目标端口号80/443， 并将TCP头中的flag标记为[ACK, PUSH] 。如果发送的数据大小是N bytes，那么将自己的Sequence Number 增加N。然后封装IP头和以太头进行发送：<br><img src="./images/TCPconnect/HTTPrequest.png" alt="HTTPrequest.png"></p>
+<h2 id="数据发送和接收"><a href="#数据发送和接收" class="headerlink" title="数据发送和接收"></a>数据发送和接收</h2><p>服务器接受到这个数据包（或者一系列数据包）之后，它会发送一个ACK包，ACK 的值设置为接收到的数据包的最后一个序列号，这个包的内容是HTTP的响应的内容：<br>`<br>200 OK<br>[响应头部]</p>
+<p>[baidu 网页的html内容]<br>`<br>200 是响应码，表示这次响应的状态，当然也可能是其他的响应码，比如我们常见的404 Not found，403 Forbidden等等。<br>消息在TCP头中设置[ACK, PUSH] 标记，然后发送给客户端。</p>
+<p>客户端收到消息后，对HTTP响应报文进行解析，在解析完 HTML 之后，浏览器和客户端会重复上面数据请求，发送和接受过程，直到HTML页面引入的所有资源（比如css，图片等等）, 区别在于请求的格式会发生变化，比如<code>GET /xxx.jpg HTTP/1.1</code>。</p>
+<h2 id="关闭TCP连接"><a href="#关闭TCP连接" class="headerlink" title="关闭TCP连接"></a>关闭TCP连接</h2><ul>
+<li>当浏览器不再需要请求新的数据，它会请求关闭TCP连接。这个时候进行socket的close() 系统调用，客户端会发送一条请求关闭连接的消息，消息中设置FIN的标记，表示这是一条关闭消息。客户端进入FIN_WAIT_1 的状态， 表示这个时候我无法发送数据，但是依然可以接受数据。</li>
+<li>服务器接受到以后，回复给客户端一条ACK消息，并将客户端消息中的序列号SN +1 以后拷贝到ACK域中。服务器端进入了CLOSE_WAIT状态，这个时候服务器端还是可以发送数据的。<br>客户端接收以后这个ACK以后，进入FIN_WAIT_2 的状态，等待服务器端进行close。</li>
+<li>服务器端再发送一条关闭连接的消息，消息中设置FIN标记，发送以后自己也进入了LAST_ACK状态，此后服务器也无法发送数据了。 </li>
+<li>客户端收到这条消息以后，回复一条ACK消息给服务器端，并将服务器端消息中的序列号SN +1 以后拷贝到ACK域中。服务器收到以后，正式CLOSE连接。需要注意的是客户端发送完这条ACK以后进入TIMED_WAIT状态， 表示客户端需要等待一段时间才能关闭本地这个连接，在这一段时间之内，防止标识一个连接的四个资源（客户端IP，客户端端口号，服务器IP，服务器端端口号）被重新使用。</li>
+</ul>
+<p>以上四步就是大家常说的四次挥手。配个图吧～<br><img src="./images/TCPconnect/TCPFourwave.png" alt="TCPFourwave.png"></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>如果你已经阅读到这里，那么结合上一篇文章，你应该已经对一次完整的网络连接产生了印象。这篇小记只是简单的试图将一个完整的网络连接从宏观角度讲述清楚，中间提到的各个部分，比如DNS，TCP连接，每个展开来都是一个很大的分支，另外还有很多没有提到的内容，比如TCP是如何进行拥塞控制的，如果发生丢包，怎么进行重传的，HTTPS的TLS连接是怎么回事等等。大家如果有兴趣可以私信我一起讨论学习。希望我的文章可以帮助到大家。<br>                                                                                                                                                                            李瑞，2021年6月27日</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://rayrayli.github.io/blog/2021/04/17/advantage-shuffle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.jpeg">
+      <meta itemprop="name" content="Rui Li">
+      <meta itemprop="description" content="These violent delights have violent ends.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ray's blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/blog/2021/04/17/advantage-shuffle/" class="post-title-link" itemprop="url">advantage shuffle</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-17 12:15:40 / Modified: 13:44:22" itemprop="dateCreated datePublished" datetime="2021-04-17T12:15:40-04:00">2021-04-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/blog/categories/leetcode/" itemprop="url" rel="index"><span itemprop="name">leetcode</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>最近碰到一道很有意思的题目， 叫作优势排序：</p>
+<p><img src="./images/advantageshuffle.png" alt="advantageshuffle"></p>
+<p>一句话来总结就是说A和B手里有一组牌，每轮他们都可以分别出一牌进行PK，假设B的出牌顺序不变，那么A什么样的出牌顺序能让A最终的pk的优势最大？</p>
+<p>仔细想想，我们可以用这样的策略：A用自己最小的牌a和B最小的牌b进行比较，如果a&gt;b, 我们就用a来匹配b，因为此时A中剩余的其他牌都要比b大，使用最弱的牌a可以让我们剩余的牌严格变大，这样A有更多的优势去赢B。如果a&lt;b, 那么我们用a去匹配B中最大的牌，削弱B的最强的顶尖力量，这样A中剩余的牌也有更多的机会去赢B。</p>
+<p>等等，这样的策略是不是有点耳熟，这不就是我们小学课本中学过的田忌赛马的策略吗？</p>
+<blockquote>
+<p>齐国的大将田忌很喜欢赛马。有一回他和齐威王约定，进行一次比赛。<br>他们把各自的马分成上、中、下三等。比赛的时候，上等马对上等马，中等马对中等马，下等马对下等马。由于齐威王每个等级都比田忌的强，三场比下来，田忌都失败了。田忌觉得很扫兴，垂头丧气地准备离开赛马场。<br>这时，田忌发现，他的好朋友孙膑也在人群里。孙膑招呼田忌过来，拍着他的肩膀，说：“从刚才的情形看，齐威王的马比你的马快不了多少呀……”<br>孙膑还没说完，田忌瞪了他一眼，说：“想不到你也来挖苦我！”<br>孙膑说：“我不是挖苦你，你再同他赛一次，我有办法让你取胜。”<br>田忌疑惑地看着孙膑：“你是说另换几匹马？”<br>孙膑摇摇头，说：“一匹也不用换。”<br>田忌没有信心地说：“那还不是照样输！”<br>孙膑胸有成竹地说：“你就照我的主意办吧。”  齐威王正在得意洋洋地夸耀自己的马，看见田忌和孙膑过来了，便讥讽田忌：“怎么，难道你还不服气？”<br>田忌说：“当然不服气，咱们再赛一次！”<br>齐威王轻蔑地说：“那就来吧！”<br>一声锣响，赛马又开始了。<br>孙膑让田忌先用下等马对齐威王的上等马，第一场输了。<br>接着进行第二场比赛。孙膑让田忌拿上等马对齐威王的中等马，胜了第二场。齐威王有点儿心慌了。<br>第三场，田忌拿中等马对齐威王的下等马，又胜了一场。这下，齐威王目瞪口呆了。<br>比赛结果，田忌胜两场输一场，赢了齐威王。<br>还是原来的马，只调换了一下出场顺序，就可以转败为胜。`</p>
+</blockquote>
+<p>再次回顾一下，如果我们把B中牌的顺序当成齐威王的马匹出场顺序，B中每个元素当成齐威王的马匹能力，那么问题就变成，如何调整田忌（A）的出马顺序，能让赢的场次更多？</p>
+<p>我们第一步，将齐威王的马和田忌的马按照能力值先进行从大到小排序，同时我们记录齐威王的马的原来的出场顺序。<br>第二步，我们用田忌的最弱的马和齐威王最弱的马进行比较，如果田忌的马强，就让这两匹马进行比赛，如果田忌的马弱，则让该马去和齐威王最强的马进行比赛。</p>
+<p>写成python代码如下：</p>
+<pre><code>def advantageCount(self, A: List[int], B: List[int]) -&gt; List[int]:
+    #用来保存A马匹的最终pk顺序
+    res = [None] * len(A)
+    #保存排序B马匹，并记录每个马的原始位置
+    B = collections.deque(sorted([(b, i) for i,b in enumerate(B)]))
+    #从小到大遍历A马匹
+    for i in sorted(A):
+        #如果当前A中最弱的马比B中最弱的马强，则使用该马进行pk，将此马记录到B对应的位置上去
+        if i &gt; B[0][0]:
+            res[B.popleft()[1]] = i
+        #如果当前A中最弱的马比B中最弱的马弱，使用该马pkB中最强的马，并进行记录。
+        else:
+            res[B.pop()[1]] = i
+    return res</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="https://rayrayli.github.io/blog/2021/01/18/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -310,15 +617,21 @@
       <div class="site-state-item site-state-posts">
           <a href="/blog/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/blog/categories/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/blog/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>

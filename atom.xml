@@ -6,7 +6,7 @@
   <link href="https://rayrayli.github.io/blog/atom.xml" rel="self"/>
   
   <link href="https://rayrayli.github.io/blog/"/>
-  <updated>2021-01-19T22:08:46.930Z</updated>
+  <updated>2021-07-09T02:17:55.066Z</updated>
   <id>https://rayrayli.github.io/blog/</id>
   
   <author>
@@ -15,6 +15,80 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>python中字符串插值替换</title>
+    <link href="https://rayrayli.github.io/blog/2021/07/05/python%E4%B8%AD%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8F%92%E5%80%BC%E6%9B%BF%E6%8D%A2/"/>
+    <id>https://rayrayli.github.io/blog/2021/07/05/python%E4%B8%AD%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8F%92%E5%80%BC%E6%9B%BF%E6%8D%A2/</id>
+    <published>2021-07-06T03:08:57.000Z</published>
+    <updated>2021-07-09T02:17:55.066Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;python string interpolation，我在这里翻译成字符串插值替换。 字符串插值替换常见于&lt;code&gt;f-strings&lt;/code&gt;, &lt;code&gt;uniterploated c-string&lt;/code&gt;</summary>
+        
+      
+    
+    
+    
+    
+    <category term="language" scheme="https://rayrayli.github.io/blog/tags/language/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>当你在浏览器中输入网址后回车发生了什么</title>
+    <link href="https://rayrayli.github.io/blog/2021/05/02/%E5%BD%93%E4%BD%A0%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%90%8E%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/"/>
+    <id>https://rayrayli.github.io/blog/2021/05/02/%E5%BD%93%E4%BD%A0%E5%9C%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E8%BE%93%E5%85%A5%E7%BD%91%E5%9D%80%E5%90%8E%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88/</id>
+    <published>2021-05-02T22:42:41.000Z</published>
+    <updated>2021-07-20T16:07:54.394Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;你是否曾经思考过我们每天到底是如何上网的呢？当你打开电脑，在浏览器上输入网址，比如&lt;a href=&quot;http://www.baidu.com,或者其他什么八卦网址/&quot;&gt;www.baidu.com，或者其他什么八卦网址&lt;/a&gt;, </summary>
+        
+      
+    
+    
+    
+    <category term="network" scheme="https://rayrayli.github.io/blog/categories/network/"/>
+    
+    
+    <category term="network" scheme="https://rayrayli.github.io/blog/tags/network/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>advantage shuffle</title>
+    <link href="https://rayrayli.github.io/blog/2021/04/17/advantage-shuffle/"/>
+    <id>https://rayrayli.github.io/blog/2021/04/17/advantage-shuffle/</id>
+    <published>2021-04-17T16:15:40.000Z</published>
+    <updated>2021-04-17T17:44:22.600Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;最近碰到一道很有意思的题目， 叫作优势排序：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;./images/advantageshuffle.png&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="leetcode" scheme="https://rayrayli.github.io/blog/categories/leetcode/"/>
+    
+    
+    <category term="leetcode," scheme="https://rayrayli.github.io/blog/tags/leetcode/"/>
+    
+  </entry>
   
   <entry>
     <title>Hello World</title>
